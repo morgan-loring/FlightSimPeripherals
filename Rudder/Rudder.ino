@@ -10,6 +10,7 @@
 #define LEFT_BRAKE_PIN A1
 #define RIGHT_BRAKE_PIN A2
 #define CALIBRATE_PIN 7
+#define STATUS_LED_PIN 9
 
 //####################################################
 //      Types
@@ -34,6 +35,7 @@ static volatile RudderPedalState_t s_state = NORMAL;
 void setup() {
   Serial.begin(9600);
   pinMode(CALIBRATE_PIN, INPUT_PULLUP);
+  pinMode(STATUS_LED_PIN, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(CALIBRATE_PIN), calibrationSwitchISR, CHANGE);
 
   rudderPedal.Init();
@@ -48,6 +50,7 @@ void loop() {
     case CAL_START:
       rudderPedal.StartCal();
       s_state = CALIBRATION;
+      digitalWrite(STATUS_LED_PIN, HIGH);
       break;
     case CALIBRATION:
       rudderPedal.Calibrate();
@@ -55,6 +58,7 @@ void loop() {
     case CAL_FINISHED:
       rudderPedal.WriteCalValues();
       s_state = NORMAL;
+      digitalWrite(STATUS_LED_PIN, LOW);
       break;
     default:
       break;
